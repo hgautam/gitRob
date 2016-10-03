@@ -81,6 +81,7 @@ module Gitrob
            :desc    => "Verify or don't verify SSL connection (careful here)"
     def analyze(targets)
       accept_tos
+      puts "inside cli calling Analyze"
       Gitrob::CLI::Commands::Analyze.start(targets, options)
     end
 

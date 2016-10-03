@@ -9,6 +9,7 @@ module Gitrob
                 @db_owner = @db_assessment.save_owner(owner)
                 thread_pool do |pool|
                   repositories_for_owner(owner).each do |repo|
+                    puts repo
                     pool.process do
                       db_repo = @db_assessment.save_repository(repo, @db_owner)
                       blobs   = blobs_for_repository(repo)
