@@ -4,16 +4,28 @@ module Gitrob
       class Analyze < Gitrob::CLI::Command
         module Analysis
           def analyze_repositories
+           abort("Too many arguments!!!") unless @targets.length == 2
             repo_progress_bar do |progress|
               github_data_manager.owners.each do |owner|
                 @db_owner = @db_assessment.save_owner(owner)
                 thread_pool do |pool|
                   repositories_for_owner(owner).each do |repo|
-                    puts repo
-                    pool.process do
-                      db_repo = @db_assessment.save_repository(repo, @db_owner)
-                      blobs   = blobs_for_repository(repo)
-                      analyze_blobs(blobs, db_repo, @db_owner, progress)
+                    puts repo 
+                    puts @targets
+                    abort("Too many arguments!!!") unless @targets.length == 2
+                    reponame = @targets[1]
+                    puts "repo to be scaned..."
+                    puts reponame
+                    #name = "sonar-examples"
+                    #repo1.to_s
+                    #puts "============"
+                    if ( repo.to_s =~ /#{reponame}/) 
+                      puts "match....."
+                      pool.process do
+                        db_repo = @db_assessment.save_repository(repo, @db_owner)
+                        blobs   = blobs_for_repository(repo)
+                        analyze_blobs(blobs, db_repo, @db_owner, progress)
+                      end
                     end
                   end
                 end
@@ -32,6 +44,9 @@ module Gitrob
                 db_owner.findings_count += 1
                 db_repo.findings_count += 1
               end
+              #else
+              #  puts "no issues found"
+              #end
             end
             db_owner.save
             db_repo.save

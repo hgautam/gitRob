@@ -12,10 +12,10 @@ module Gitrob
           Thread.abort_on_exception = true
           @options = options
           @targets = targets.split(",").map(&:strip).uniq
-          user = @targets[0]
-          repo = @targets[1]
-          puts "user is " + user 
-          puts "repo is " + repo
+          #user = @targets[0]
+          #repo = @targets[1]
+          #puts "user is " + user 
+          #puts "repo is " + repo
           load_signatures!
           create_database_assessment
           puts "gather owners"
@@ -23,9 +23,9 @@ module Gitrob
           puts "gather repos"
           gather_repositories
           analyze_repositories
-          #@db_assessment.finished = true
-          #@db_assessment.save
-          #start_web_server
+          @db_assessment.finished = true
+          @db_assessment.save
+          start_web_server
         end
 
         private
@@ -37,6 +37,8 @@ module Gitrob
             :verify_ssl => @options[:verify_ssl],
             :finished   => false
           )
+          #puts "db assessment is...."
+          #puts @db_assessment
           github_access_tokens.each do |access_token|
             @db_assessment.save_github_access_token(access_token)
           end

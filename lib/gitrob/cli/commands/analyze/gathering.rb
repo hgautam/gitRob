@@ -24,20 +24,13 @@ module Gitrob
             end
             fatal("No repositories found; exiting") if repo_count.zero?
             info "Gathered #{repo_count} repositories"
-            @myrepos = github_data_manager.get_repositories("hgautam")
-            #puts "my repos are... " 
-            #puts @myrepos
-            puts "targets are..."
-            puts @targets
-            @repos = github_data_manager.repositories_for_owner(@targets[0])
-            puts @repos
           end
 
           def github_data_manager
             #puts "inside data manager"
             #puts @targets
             #puts "deleting last index of the array"
-            @targets.delete_at(1)
+            #@targets.delete_at(1)
             #puts "array after deletion"
             #puts @targets
             unless @github_data_manager
