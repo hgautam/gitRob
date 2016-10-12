@@ -27,12 +27,6 @@ module Gitrob
           end
 
           def github_data_manager
-            #puts "inside data manager"
-            #puts @targets
-            #puts "deleting last index of the array"
-            #@targets.delete_at(1)
-            #puts "array after deletion"
-            #puts @targets
             unless @github_data_manager
               @github_data_manager = Gitrob::Github::DataManager.new(
                 @targets, github_client_manager

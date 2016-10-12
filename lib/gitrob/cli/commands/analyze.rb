@@ -12,15 +12,10 @@ module Gitrob
           Thread.abort_on_exception = true
           @options = options
           @targets = targets.split(",").map(&:strip).uniq
-          #user = @targets[0]
-          #repo = @targets[1]
-          #puts "user is " + user 
-          #puts "repo is " + repo
+          abort("too many arguments. Exiting!!") unless @targets.length == 2
           load_signatures!
           create_database_assessment
-          puts "gather owners"
           gather_owners
-          puts "gather repos"
           gather_repositories
           analyze_repositories
           @db_assessment.finished = true
