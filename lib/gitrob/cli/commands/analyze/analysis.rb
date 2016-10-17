@@ -1,3 +1,5 @@
+require 'net/smtp'
+#require 'smtp-tls'
 module Gitrob
   class CLI
     module Commands
@@ -67,8 +69,30 @@ module Gitrob
             progress.info(
               "Flagged #{files.to_s.light_yellow} " \
               "in #{repo.full_name.bold}")
+            assessment = Sequel::Model.db.from(:assessments) 
+            puts assessment.order(:id).last
+            send_email
           end
+          
+          def send_email
+            message = <<MESSAGE_END
+            From: Himanshu Gautam <hgautam@ebay.com>
+            To: Himanshu Gautam <hgautam@ebay.com>
+            MIME-Version: 1.0
+            Content-type: text/html
+            Subject: SMTP e-mail test
+
+            This is an e-mail message to be sent in HTML format
+
+            <b>This is HTML message.</b>
+            <h1>This is headline.</h1>
+MESSAGE_END
+            Net::SMTP.start('atom.corp.ebay.com', 25) do |smtp|
+                 smtp.send_message message, 'hgautam@ebay.com', 
+                             'hgautam@ebay.com'
+            end
         end
+      end
 
         def repo_progress_bar
           progress_bar(

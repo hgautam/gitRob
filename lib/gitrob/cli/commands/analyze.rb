@@ -32,11 +32,14 @@ module Gitrob
             :verify_ssl => @options[:verify_ssl],
             :finished   => false
           )
-          #puts "db assessment is...."
-          #puts @db_assessment
+          puts "db assessment is...."
+          puts @db_assessment
+          #puts @db_assessment.first
           github_access_tokens.each do |access_token|
             @db_assessment.save_github_access_token(access_token)
           end
+          #assessment = Sequel::Model.db.from(:assessments)
+          #puts assessment.order(:id).last
         end
 
         def load_signatures!
