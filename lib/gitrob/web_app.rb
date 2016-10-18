@@ -53,21 +53,21 @@ module Gitrob
         return url if url.start_with?("http")
         "http://#{url}"
       end
+     
+      def protect_from_request_forgery!
+        session[:csrf] ||= SecureRandom.hex(32)
+        halt(403, "CSRF attack prevented") if csrf_attack?
+      end
 
-      #def protect_from_request_forgery!
-      #  session[:csrf] ||= SecureRandom.hex(32)
-     #   halt(403, "CSRF attack prevented") if csrf_attack?
-     # end
+      def csrf_token_from_request
+        csrf_token = env["HTTP_X_CSRF_TOKEN"] || params["_csrf"]
+        halt(403, "CSRF token not present in request") if csrf_token.to_s.empty?
+        csrf_token
+      end
 
-      #def csrf_token_from_request
-      #  csrf_token = env["HTTP_X_CSRF_TOKEN"] || params["_csrf"]
-      #  halt(403, "CSRF token not present in request") if csrf_token.to_s.empty?
-      #  csrf_token
-      #end
-
-      #def csrf_attack?
-      #  !request.safe? && csrf_token_from_request != session[:csrf]
-      #end
+      def csrf_attack?
+        !request.safe? && csrf_token_from_request != session[:csrf]
+      end
 
       def find_assessment(id)
         Gitrob::Models::Assessment.first(
@@ -91,9 +91,17 @@ module Gitrob
       response.headers["X-Content-Type-Options"] = "nosniff"
       response.headers["X-XSS-Protection"] = "1; mode=block"
       response.headers["X-Frame-Options"] = "deny"
-      #protect_from_request_forgery!
+      #protect_from_request_forgery! 
+      str = "/api/assessments"
+      if request.path_info =~ /#{str}/
+         puts request.path_info
+      else
+         #puts "no match found"
+         protect_from_request_forgery!
+         #puts request.path_info
+      end
     end
-
+ 
     get "/" do
       @assessments =
         Gitrob::Models::Assessment
@@ -112,8 +120,31 @@ module Gitrob
       erb :"assessments/_assessments", :layout => false
     end
 
+    post "/api/assessments" do
+        #puts params.inspect
+        #puts request.path_info
+        if params[:assessment][:verify_ssl]
+          verify_ssl = true
+        else
+           verify_ssl = false
+        end
+        options = {
+          :endpoint      => params[:assessment][:endpoint],
+          :site          => params[:assessment][:site],
+          :verify_ssl    => verify_ssl,
+          :access_tokens => params[:assessment][:github_access_tokens]
+         }
+
+         Gitrob::Jobs::Assessment.perform_async(
+            params[:assessment][:targets],
+            options
+         )
+         status 202 # Accepted
+    end
+
     post "/assessments" do
-      puts params.inspect
+      #puts params.inspect
+      protect_from_request_forgery!
       if params[:assessment][:verify_ssl]
         verify_ssl = true
       else

@@ -48,12 +48,6 @@ module Gitrob
                 db_owner.findings_count += 1
                 db_repo.findings_count += 1
               end
-              #else
-              #  puts "no issues found"
-              #end
-            end
-            if findings == 0
-               puts "No issues found"
             end
             db_owner.save
             db_repo.save
@@ -70,22 +64,32 @@ module Gitrob
               "Flagged #{files.to_s.light_yellow} " \
               "in #{repo.full_name.bold}")
             assessment = Sequel::Model.db.from(:assessments) 
-            puts assessment.order(:id).last
-            send_email
+            #gets the last record
+            ass1 = assessment.select(:id).order(:id).last
+            #splits the string {id=>45}
+            @values =  ass1.to_s.split("=>")
+            #deletes trailing }
+            id = @values[1].delete "}"
+            puts "id is..."
+            puts id
+            #ass2 = ass1.get(:id)
+            #puts ass2
+            send_email(id)
           end
           
-          def send_email
-            message = <<MESSAGE_END
-            From: Himanshu Gautam <hgautam@ebay.com>
-            To: Himanshu Gautam <hgautam@ebay.com>
-            MIME-Version: 1.0
-            Content-type: text/html
-            Subject: SMTP e-mail test
+          def send_email(id)
+message = <<MESSAGE_END
+From: Himanshu Gautam <hgautam@ebay.com>
+To: Himanshu Gautam <hgautam@ebay.com>
+MIME-Version: 1.0
+Content-type: text/html
+Subject: Gitrob Notification
 
-            This is an e-mail message to be sent in HTML format
 
-            <b>This is HTML message.</b>
-            <h1>This is headline.</h1>
+Please click the following link to see Gitrob findings.
+
+http://gitrob-dev-8848.phx01.dev.ebayc3.com/assessments/#{id}/findings
+
 MESSAGE_END
             Net::SMTP.start('atom.corp.ebay.com', 25) do |smtp|
                  smtp.send_message message, 'hgautam@ebay.com', 
