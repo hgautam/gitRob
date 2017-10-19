@@ -79,8 +79,8 @@ module Gitrob
           
           def send_email(id)
 message = <<MESSAGE_END
-From: Himanshu Gautam <hgautam@ebay.com>
-To: Himanshu Gautam <hgautam@ebay.com>
+From: Himanshu Gautam <hgautam@abc.com>
+To: Himanshu Gautam <hgautam@abc.com>
 MIME-Version: 1.0
 Content-type: text/html
 Subject: Gitrob Notification
@@ -88,12 +88,12 @@ Subject: Gitrob Notification
 
 Please click the following link to see Gitrob findings.
 
-http://gitrob-dev-8848.phx01.dev.ebayc3.com/assessments/#{id}/findings
+http://gitrob-dev-8848.phx01.dev.abcc3.com/assessments/#{id}/findings
 
 MESSAGE_END
-            Net::SMTP.start('atom.corp.ebay.com', 25) do |smtp|
-                 smtp.send_message message, 'hgautam@ebay.com', 
-                             'hgautam@ebay.com'
+            Net::SMTP.start('atom.corp.abc.com', 25) do |smtp|
+                 smtp.send_message message, 'hgautam@abc.com', 
+                             'hgautam@abc.com'
             end
         end
       end
